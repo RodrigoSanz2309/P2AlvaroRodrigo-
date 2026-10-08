@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Mi nombre</title>
+    <link rel="stylesheet" href="./css/iroom.css">
+</head>
+<body>
+    <header>
+        <h1>Smart Room</h1>
+    </header>
+
+    <main>
+        <section>
+            <h2>Introduzca su nombre</h2>
+
+            <form id="formNombre">
+                <label for="nombre">Nombre:</label>
+                <input type="text" id="nombre" name="nombre" placeholder="Escriba su nombre" required>
+                <button type="submit">Guardar</button>
+            </form>
+            <p><a href="index.html">Volver a la página principal</a></p>
+        </section>
+    </main>
+    <footer>Universidad de Alcalá</footer>
+
+    <script>
+        const formulario = document.getElementById("formNombre");
+        const campo = document.getElementById("nombre");
+        campo.value = localStorage.getItem("fname") || "";
+
+        formulario.addEventListener("submit", function(evento) {
+            evento.preventDefault();
+            const nombre = campo.value.trim();
+            if (nombre === "")return;
+            localStorage.setItem("fname", nombre);
+            alert("Nombre guardado: " + nombre + ". Ahora puede volver a la página principal.");
+        });
+    </script>
+</body>
+</html>
+
+
