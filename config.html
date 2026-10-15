@@ -24,12 +24,8 @@
                 <h2>Datos de la habitación</h2>
 
                 <label for="pais">País:</label>
-                <input type="text" id="pais" name="pais" placeholder="Ej. España" list="lista-paises" autocomplete="off">
-                <datalist id="lista-paises">
-                    <option value="España"></option>
-                    <option value="Portugal"></option>
-                    <option value="Francia"></option>
-                </datalist>
+                <input type="text" id="pais" name="pais" placeholder="Introduzca su país" autocomplete="off">
+
 
 
 
@@ -110,6 +106,8 @@
     <footer>Universidad de Alcalá</footer>
         <script>
 
+    
+
             const CIUDADES = {
                 "España": ["Madrid", "Barcelona", "Valencia"],
                 "Francia": ["París", "Lyon", "Marsella"],
@@ -165,6 +163,17 @@
             }
             inputMax.addEventListener("input", calculoDiferencia);
             inputMin.addEventListener("input", calculoDiferencia);
+
+
+
+            const formulario = document.querySelector("form");
+            formulario.addEventListener("submit", function(evento){
+                const paisIntroducido = document.getElementById("pais").value;
+                const paisPermitido = ["españa", "francia", "portugal"];
+                if (!paisPermitido.includes(paisIntroducido.trim().toLowerCase())){
+                    eveto.preventDefault();
+                }
+            });
         </script>
 </body>
 </html>
