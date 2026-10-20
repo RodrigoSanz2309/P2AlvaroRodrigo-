@@ -61,3 +61,87 @@ function generarEnlaceGoogleMaps() {
         if (errorGPS) errorGPS.style.display = "inline";
     }
 }
+
+
+function validarEmailCadenas() {
+    const emailInput = document.getElementById("email").value.trim();
+    const resultado = document.getElementById("resultadoEmail");
+
+    if (emailInput === "") {
+        resultado.style.color = "red";
+        resultado.textContent = "Por favor, introduce un correo electrónico.";
+        return;
+    }
+
+    // 1. No espacios
+    if (emailInput.includes(" ")) {
+        resultado.style.color = "red";
+        resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
+        return;
+    }
+
+    // 2. Debe contener exactamente una '@'
+    const primeraArroba = emailInput.indexOf("@");
+    const ultimaArroba = emailInput.lastIndexOf("@");
+
+    if (primeraArroba === -1 || primeraArroba !== ultimaArroba) {
+        resultado.style.color = "red";
+        resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
+        return;
+    }
+
+    // Dividir en usuario y dominio
+    const usuario = emailInput.substring(0, primeraArroba);
+    const dominio = emailInput.substring(primeraArroba + 1);
+
+    // 3. El usuario no puede estar vacío
+    if (usuario.length === 0) {
+        resultado.style.color = "red";
+        resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
+        return;
+    }
+
+    // 4. El dominio debe tener al menos un punto y no empezar ni terminar con punto
+    if (!dominio.includes(".") || dominio.startsWith(".") || dominio.endsWith(".")) {
+        resultado.style.color = "red";
+        resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
+        return;
+    }
+
+    // 5. Comprobar que ninguna de las partes del dominio esté vacía (ej. dominio..es)
+    const partesDominio = dominio.split(".");
+    for (let i = 0; i < partesDominio.length; i++) {
+        if (partesDominio[i].length === 0) {
+            resultado.style.color = "red";
+            resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
+            return;
+        }
+    }
+
+    // Si pasa todas las comprobaciones
+    resultado.style.color = "green";
+    resultado.textContent = "Resultado (Sin Regex): Dirección Válida";
+}
+
+// Validar Email CON Expresiones Regulares
+function validarEmailRegex() {
+    const emailInput = document.getElementById("email").value.trim();
+    const resultado = document.getElementById("resultadoEmail");
+
+    if (emailInput === "") {
+        resultado.style.color = "red";
+        resultado.textContent = "Por favor, introduce un correo electrónico.";
+        return;
+    }
+
+    // Expresión regular que valida: usuario@dominio.tld (con soporte para subdominios)
+    const regexEmail = /^[^\s@]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
+
+    if (regexEmail.test(emailInput)) {
+        resultado.style.color = "green";
+        resultado.textContent = "Resultado (Con Regex): Dirección Válida";
+    } else {
+        resultado.style.color = "red";
+        resultado.textContent = "Resultado (Con Regex): Dirección Inválida";
+    }
+}
