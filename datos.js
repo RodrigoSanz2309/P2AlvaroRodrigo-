@@ -145,3 +145,102 @@ function validarEmailRegex() {
         resultado.textContent = "Resultado (Con Regex): Dirección Inválida";
     }
 }
+
+/* =========================================================
+   APARTADO 4: CALCULADORA DE TEMPERATURAS
+   ========================================================= */
+
+let expresionActual = "";
+let unidadActual = "°C";
+
+function presionarNumero(valor) {
+    if (expresionActual === "0" && valor !== ".") {
+        expresionActual = valor;
+    } else {
+        expresionActual += valor;
+    }
+    actualizarPantalla();
+}
+
+function presionarOperador(op) {
+    if (expresionActual === "") return;
+    expresionActual += " " + op + " ";
+    actualizarPantalla();
+}
+
+function limpiarPantalla() {
+    expresionActual = "";
+    actualizarPantalla();
+}
+
+function actualizarPantalla() {
+    const pantallaValor = document.getElementById("valorPantalla");
+    const pantallaUnidad = document.getElementById("unidadPantalla");
+
+    if (pantallaValor) {
+        pantallaValor.textContent = expresionActual || "0";
+    }
+    if (pantallaUnidad) {
+        pantallaUnidad.textContent = unidadActual;
+    }
+}
+
+function calcularResultado() {
+    try {
+        if (!expresionActual) return;
+        
+        // Evaluar la expresión matemática
+        let resultado = eval(expresionActual);
+        
+        if (isNaN(resultado) || !isFinite(resultado)) {
+            expresionActual = "Error";
+        } else {
+            // Redondear a 2 decimales si no es entero
+            expresionActual = Number.isInteger(resultado) ? resultado.toString() : parseFloat(resultado.toFixed(2)).toString();
+        }
+    } catch (e) {
+        expresionActual = "Error";
+    }
+    actualizarPantalla();
+}
+
+/**
+ * Convierte la cifra actual en pantalla entre Celsius (°C), Fahrenheit (°F) y Kelvin (K)
+ */
+function convertirA(nuevaUnidad) {
+    // Si hay un cálculo pendiente, evaluarlo primero
+    if (expresionActual && expresionActual !== "Error") {
+        calcularResultado();
+    }
+
+    let valor = parseFloat(expresionActual);
+    if (isNaN(valor)) return;
+
+    // Si ya está en esa unidad, no hace nada
+    let unifActualClean = unidadActual.replace("°", "");
+    if (unifActualClean === nuevaUnidad) return;
+
+    // 1. Convertir el valor actual a Celsius como base
+    let enCelsius = valor;
+    if (unifActualClean === "F") {
+        enCelsius = (valor - 32) * (5 / 9);
+    } else if (unifActualClean === "K") {
+        enCelsius = valor - 273.15;
+    }
+
+    // 2. Convertir desde Celsius a la nueva unidad de destino
+    let resultadoFinal = enCelsius;
+    if (nuevaUnidad === "F") {
+        resultadoFinal = (enCelsius * (9 / 5)) + 32;
+        unidadActual = "°F";
+    } else if (nuevaUnidad === "K") {
+        resultadoFinal = enCelsius + 273.15;
+        unidadActual = "K";
+    } else if (nuevaUnidad === "C") {
+        resultadoFinal = enCelsius;
+        unidadActual = "°C";
+    }
+
+    expresionActual = parseFloat(resultadoFinal.toFixed(2)).toString();
+    actualizarPantalla();
+}
