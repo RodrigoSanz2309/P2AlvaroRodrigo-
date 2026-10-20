@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Configuración - Smart Room</title>
     <link rel="stylesheet" href="./css/iroom.css">
+    <script src="datos.js"></script>
 
 </head>
 
@@ -40,8 +41,12 @@
                 <input type="url" id="mapa" name="mapa" placeholder="Introduce la URL del mapa">           
 
 
-                <label for="gps">Coordenadas GPS:</label>
-                <input type="text" id="gps" name="gps" placeholder="Ej. 40.4168, -3.7038">
+                <label for="coordenadasGPS">Coordenadas GPS:</label>
+            <input type="text" id="coordenadasGPS" name="gps" placeholder="Ej. 40.4168, -3.7038" oninput="generarEnlaceGoogleMaps()">
+            <p>
+                <a id="enlaceMapa" href="#" target="_blank" style="display: none; color: #0066cc;">Ver posición en Google Maps</a>
+                <span id="errorGPS" style="color: red; display: none;">Formato de coordenadas no válido</span>
+            </p>
 
 
                 <label for="imagen">Imagen:</label>
