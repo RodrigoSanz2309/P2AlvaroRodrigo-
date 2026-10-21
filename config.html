@@ -140,8 +140,8 @@
 
             function actualizarCiudades() {
                 listaCiudades.innerHTML = "";
-                const ciudades = CIUDADES[inputPais.value] || [];
-                ciudades.forEach(function(ciudad){
+                const clave = Object.keys(CIUDADES).find(p => p.toLowerCase() === inputPais.value.trim().toLowerCase());
+                (CIUDADES[clave] || []).forEach(function(ciudad){
                     const opcion = document.createElement("option");
                     opcion.value = ciudad;
                     listaCiudades.appendChild(opcion);                 

@@ -12,7 +12,10 @@ function dmsADecimal(direccion, grados, minutos, segundos) {
 }
 
 function generarEnlaceGoogleMaps() {
-    const inputGPS = document.getElementById("coordenadasGPS").value.trim();
+    const inputGPS = document.getElementById("coordenadasGPS").value.trim()
+        .replace(/[º˚]/g, "°")
+        .replace(/[’′‘]/g, "'")
+        .replace(/[”″“]/g, '"');
     const enlaceMapa = document.getElementById("enlaceMapa");
     const errorGPS = document.getElementById("errorGPS");
 
@@ -27,7 +30,7 @@ function generarEnlaceGoogleMaps() {
     let latitud = null;
     let longitud = null;
 
-    const regexDMS = /([NSEOW])?\s*(\d+)°\s*(\d+)'\s*(\d+(?:\.\d+)?)"\s*([NSEOW])?\s*,\s*([NSEOW])?\s*(\d+)°\s*(\d+)'\s*(\d+(?:\.\d+)?)"\s*([NSEOW])?/i;
+    const regexDMS = /^([NSEOW])?\s*(\d+)°\s*(\d+)'\s*(\d+(?:\.\d+)?)"\s*([NSEOW])?\s*,\s*([NSEOW])?\s*(\d+)°\s*(\d+)'\s*(\d+(?:\.\d+)?)"\s*([NSEOW])?$/i;
     const matchDMS = inputGPS.match(regexDMS);
 
     const regexDecimal = /^([+-]?\d+(?:\.\d+)?)\s*,\s*([+-]?\d+(?:\.\d+)?)$/;
@@ -73,14 +76,14 @@ function validarEmailCadenas() {
         return;
     }
 
-    // 1. No espacios
+    // No espacios
     if (emailInput.includes(" ")) {
         resultado.style.color = "red";
         resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
         return;
     }
 
-    // 2. Debe contener exactamente una '@'
+    // exactamente una '@'
     const primeraArroba = emailInput.indexOf("@");
     const ultimaArroba = emailInput.lastIndexOf("@");
 
@@ -94,21 +97,21 @@ function validarEmailCadenas() {
     const usuario = emailInput.substring(0, primeraArroba);
     const dominio = emailInput.substring(primeraArroba + 1);
 
-    // 3. El usuario no puede estar vacío
+    // El usuario no vacío
     if (usuario.length === 0) {
         resultado.style.color = "red";
         resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
         return;
     }
 
-    // 4. El dominio debe tener al menos un punto y no empezar ni terminar con punto
+    // El dominio debe tener al menos un punto y no empezar ni terminar con punto
     if (!dominio.includes(".") || dominio.startsWith(".") || dominio.endsWith(".")) {
         resultado.style.color = "red";
         resultado.textContent = "Resultado (Sin Regex): Dirección Inválida";
         return;
     }
 
-    // 5. Comprobar que ninguna de las partes del dominio esté vacía (ej. dominio..es)
+    // Comprobar que ninguna de las partes del dominio esté vacía 
     const partesDominio = dominio.split(".");
     for (let i = 0; i < partesDominio.length; i++) {
         if (partesDominio[i].length === 0) {
@@ -118,9 +121,32 @@ function validarEmailCadenas() {
         }
     }
 
-    // Si pasa todas las comprobaciones
+    const letras = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const permitidos = letras + "0123456789-";
+    let valido = true;
+
+    const tld =partesDominio[partesDominio.length -1];
+    if (tld.length <2) valido =false;
+    for (let i=0; i<tld.length;i++){
+        if(!letras.includes(tld[i]))valido=false;
+    }
+
+    for (let i=0;i<partesDominio.length -1;i++){
+        for(let j=0; j<partesDominio[i].length; j++){
+            if(!permitidos.includes(partesDominio[i][j]))valido=false;
+        }
+    }
+    if(!valido){
+        resultado.style.color ="red";
+        resultado.textContent = "Resultado (sin regex): dirección inválida";
+        return;
+    }
+
+    // Si todo ok
     resultado.style.color = "green";
     resultado.textContent = "Resultado (Sin Regex): Dirección Válida";
+
+
 }
 
 // Validar Email CON Expresiones Regulares
@@ -134,7 +160,7 @@ function validarEmailRegex() {
         return;
     }
 
-    // Expresión regular que valida: usuario@dominio.tld (con soporte para subdominios)
+    // Expresión regular que valida: usuario@dominio.tld
     const regexEmail = /^[^\s@]+@([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}$/;
 
     if (regexEmail.test(emailInput)) {
@@ -146,14 +172,16 @@ function validarEmailRegex() {
     }
 }
 
-/* =========================================================
-   APARTADO 4: CALCULADORA DE TEMPERATURAS
-   ========================================================= */
 
 let expresionActual = "";
 let unidadActual = "°C";
+let resultadoMostrado=false;
 
 function presionarNumero(valor) {
+    if (expresionActual==="Error" || resultadoMostrado) {
+        expresionActual="";
+        resultadoMostrado=false;
+    }
     if (expresionActual === "0" && valor !== ".") {
         expresionActual = valor;
     } else {
@@ -163,13 +191,21 @@ function presionarNumero(valor) {
 }
 
 function presionarOperador(op) {
-    if (expresionActual === "") return;
+    if (expresionActual ==="Error")expresionActual="";
+    resultadoMostrado=false;
+    if (expresionActual==="" &&op==="-"){
+        expresionActual="-";
+        actualizarPantalla();
+        return;
+    }
+    if (expresionActual==="" || expresionActual ==="-") return;
     expresionActual += " " + op + " ";
     actualizarPantalla();
 }
 
 function limpiarPantalla() {
     expresionActual = "";
+    resultadoMostrado=false;
     actualizarPantalla();
 }
 
@@ -187,26 +223,24 @@ function actualizarPantalla() {
 
 function calcularResultado() {
     try {
-        if (!expresionActual) return;
-        
-        // Evaluar la expresión matemática
-        let resultado = eval(expresionActual);
+        if (!expresionActual || expresionActual ==="Error") return;
+        let resultado = evaluarExpresion(expresionActual);
         
         if (isNaN(resultado) || !isFinite(resultado)) {
             expresionActual = "Error";
         } else {
-            // Redondear a 2 decimales si no es entero
+            // Redondear a 2 decimales
             expresionActual = Number.isInteger(resultado) ? resultado.toString() : parseFloat(resultado.toFixed(2)).toString();
         }
     } catch (e) {
         expresionActual = "Error";
     }
+    resultadoMostrado=true;
     actualizarPantalla();
 }
 
-/**
- * Convierte la cifra actual en pantalla entre Celsius (°C), Fahrenheit (°F) y Kelvin (K)
- */
+//Convierte la cifra actual en pantalla entre Celsius (°C), Fahrenheit (°F) y Kelvin (K)
+ 
 function convertirA(nuevaUnidad) {
     // Si hay un cálculo pendiente, evaluarlo primero
     if (expresionActual && expresionActual !== "Error") {
@@ -215,20 +249,25 @@ function convertirA(nuevaUnidad) {
 
     let valor = parseFloat(expresionActual);
     if (isNaN(valor)) return;
-
-    // Si ya está en esa unidad, no hace nada
+    
     let unifActualClean = unidadActual.replace("°", "");
-    if (unifActualClean === nuevaUnidad) return;
 
-    // 1. Convertir el valor actual a Celsius como base
+    //Convertir a Celsius 
     let enCelsius = valor;
     if (unifActualClean === "F") {
         enCelsius = (valor - 32) * (5 / 9);
     } else if (unifActualClean === "K") {
         enCelsius = valor - 273.15;
     }
+    if (Math.round(enCelsius*100)/100<-273.15){
+        expresionActual="Error";
+        resultadoMostrado=true;
+        actualizarPantalla();
+        return;
+    }
+    if (unifActualClean===nuevaUnidad)return;
 
-    // 2. Convertir desde Celsius a la nueva unidad de destino
+    //Convertir desde Celsius a la nueva unidad destino
     let resultadoFinal = enCelsius;
     if (nuevaUnidad === "F") {
         resultadoFinal = (enCelsius * (9 / 5)) + 32;
@@ -242,5 +281,53 @@ function convertirA(nuevaUnidad) {
     }
 
     expresionActual = parseFloat(resultadoFinal.toFixed(2)).toString();
+    resultadoMostrado = true;
     actualizarPantalla();
+}
+
+function evaluarExpresion(texto){
+    const tokens =texto.match(/\d+(?:\.\d+)?|\.\d+|[+\-*/()]/g);
+    if (!tokens||tokens.join("") !==texto.replace(/\s+/g, "")){
+        throw new Error("Expresión no válida");
+    }
+    let pos=0;
+    
+    function expresion (){
+        let valor = termino ();
+        while (tokens[pos]==="+" || tokens[pos]==="-"){
+            const op = tokens[pos++];
+            const der =termino();
+            valor = (op ==="+") ? valor +der: valor-der;
+        }
+        return valor;
+    }
+
+    function termino(){
+        let valor =factor();
+        while(tokens[pos]==="*"|| tokens[pos]==="/"){
+            const op= tokens[pos++];
+            const der =factor();
+            valor = (op==="*")? valor *der: valor/der;
+        }
+        return valor;
+    }
+
+    function factor() {
+        const t = tokens[pos++];
+        if (t === "-") return -factor();
+        if (t === "+") return factor();
+        if (t === "(") {
+            const v = expresion();
+            if (tokens[pos++] !== ")") throw new Error("Falta )");
+            return v;
+        }
+        if (t === undefined || isNaN(parseFloat(t))) {
+            throw new Error("Expresión no válida");
+        }
+        return parseFloat(t);
+    }
+
+    const resultado = expresion();
+    if (pos !== tokens.length) throw new Error("Expresión no válida");
+    return resultado;
 }
