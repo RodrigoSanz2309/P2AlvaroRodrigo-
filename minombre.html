@@ -11,6 +11,14 @@
         <h1>Smart Room</h1>
     </header>
 
+
+    <nav aria-label="Menú principal">
+    <a href="index.html" class="menu-btn">Inicio</a>
+    <a href="config.html" class="menu-btn">Configuración</a>
+    <a href="minombre.html" class="menu-btn">Nombre</a>
+    <a href="calculadora.html" class="menu-btn">Calculadora</a>
+</nav>
+
     <main>
         <section>
             <h2>Introduzca su nombre</h2>
@@ -21,7 +29,7 @@
                 <button type="submit">Guardar</button>
             </form>
 
-            <hr style="margin: 20px 0;">
+            <hr>
             <h3>Verificación de correo electrónico</h3>
       
             <div class="campo-form">
@@ -29,12 +37,12 @@
           <input type="text" id="email" name="email" placeholder="ejemplo@dominio.com">
             </div>
 
-      <div style="margin-top: 10px;">
+      <div class="botones-email">
           <button type="button" onclick="validarEmailCadenas()">Validar (Sin Regex)</button>
           <button type="button" onclick="validarEmailRegex()">Validar (Con Regex)</button>
       </div>
 
-      <p id="resultadoEmail" style="font-weight: bold; margin-top: 10px;"></p>
+      <p id="resultadoEmail"></p>
             <p><a href="index.html">Volver a la página principal</a></p>
         </section>
     </main>

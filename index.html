@@ -30,17 +30,18 @@
         <section>
             <h2>Datos de la habitación</h2>
             <ul>
-                <li>País: España</li>
-                <li>Ciudad: Alcalá de Henares</li>
-                <li>Mapa URL: <a href="https://www.google.com/maps/place/Alcal%C3%A1+de+Henares,+Madrid/@40.4819949,-3.364155,12z/data=!3m1!4b1!4m6!3m5!1s0xd4228f7c2e7d8d5:0x400bd2ce0c6e0f0!8m2!3d40.4819949!4d-3.364155!16zL20vMDJkZ2E?entry=ttu" target="_blank" rel="noopener noreferrer">Ver localización en Google Maps</a></li>
-                <li>Coordenadas GPS: 40.4819949, -3.364155</li>
+                <li>País: <span id="datoPais">España</span></li>
+                <li>Ciudad: <span id="datoCiudad">Alcalá de Henares</span></li>
+                <li>Mapa URL: <a id="datoMapa" href="https://www.google.com/maps/place/Alcal%C3%A1+de+Henares,+Madrid/@40.4819949,-3.364155,12z/data=!3m1!4b1!4m6!3m5!1s0xd4228f7c2e7d8d5:0x400bd2ce0c6e0f0!8m2!3d40.4819949!4d-3.364155!16zL20vMDJkZ2E?entry=ttu" target="_blank" rel="noopener noreferrer">Ver localización en Google Maps</a></li>
+                <li>Coordenadas GPS: <span id="datoGps">40.4819949, -3.364155</span></li>
             </ul>
             <img src="images/imagen2.jpg" alt="Dormitorio con cama doble">
         </section>
 
         <section>
             <h2>Info sensores</h2>
-            <p>Aquí se mostrarán los datos de los sensores seleccionados.</p>
+            <p id="datoSensores">Aquí se mostrarán los datos de los sensores seleccionados.</p>
+            <p id="datoAlertas"></p>
         </section>
     </main>
 
@@ -62,6 +63,40 @@
             saludo.textContent = nombre ? "Hola " + nombre + ": Bienvenido a Smart Room.":"";
         }
 
+        function mostrarConfiguracion() {
+            let config = null;
+            try {
+                config = JSON.parse(localStorage.getItem("configuracion"));
+            } catch (e) {
+                config = null;
+            }
+            if (!config) return;
+
+            if (config.pais) document.getElementById("datoPais").textContent = config.pais;
+            if (config.ciudad) document.getElementById("datoCiudad").textContent = config.ciudad;
+            if (config.gps) document.getElementById("datoGps").textContent = config.gps;
+
+            if (/^https?:\/\//i.test(config.mapa || "")) {
+                document.getElementById("datoMapa").href = config.mapa;
+            }
+
+            const sensores = config.sensores || [];
+            document.getElementById("datoSensores").textContent = sensores.length > 0
+                ? "Sensores activos: " + sensores.join(", ") + "."
+                : "No hay sensores seleccionados.";
+
+            const partes = [];
+            if (config.tempActual !== "") partes.push("Temperatura actual: " + config.tempActual + " °C");
+            if (config.tempMax !== "") partes.push("máxima: " + config.tempMax + " °C");
+            if (config.tempMin !== "") partes.push("mínima: " + config.tempMin + " °C");
+            document.getElementById("datoAlertas").textContent = partes.join(" · ");
+        }
+
+        mostrarConfiguracion();
+        window.addEventListener("pageshow", mostrarConfiguracion);
+
+
+        
         mostrarSaludo();
         window.addEventListener("pageshow", mostrarSaludo);
         window.addEventListener("storage", mostrarSaludo);
